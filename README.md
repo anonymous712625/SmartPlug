@@ -43,15 +43,15 @@ Replace with your number in international format **without `+` or spaces**, e.g.
 
 ---
 
-## How to put it live on GitHub Pages
+## How to put it live on GitHub Pages (no server, no workflows)
 
-1. Commit and push this repo to GitHub (branch `main`).
+1. Put `index.html` on your `main` branch (rename it to `index.html` if it's still called `2 (5).html`).
 2. On GitHub, open your repo → **Settings → Pages**.
-3. Under **Source**, choose **GitHub Actions** (the workflow file in this repo will build & deploy automatically on every push).
-4. Your site goes live at `https://<your-username>.github.io/SmartPlug/`.
-5. After the first build, GitHub Pages works even when your laptop is off.
+3. Under **Build and deployment → Source**, choose **Deploy from a branch**.
+4. Set the branch to **`main`** and the folder to **`/` (root)**, then **Save**.
+5. Your site goes live at `https://<your-username>.github.io/SmartPlug/` in about a minute.
 
-> A `.github/workflows/deploy.yml` is already included, so every push to `main` redeploys automatically.
+That's it. GitHub Pages keeps running even when your laptop is off.
 
 ---
 
@@ -76,7 +76,6 @@ A browser cannot call the Telegram API directly from a static page (CORS blocks 
 ## Project layout
 
 ```
-index.html                    → the landing page + order form (edit CONFIG here)
-.github/workflows/deploy.yml  → auto-deploy to GitHub Pages on every push
-README.md                     → this file
+index.html  → the landing page + order form (edit CONFIG here)
+README.md   → this file
 ```
