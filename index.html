@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html class="dark scroll-smooth" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SmartPlug - Precision Control</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+    darkMode: "class",
+    theme: {
+        extend: {
+            "colors": {
+                "surface-container-highest": "#353534",
+                "inverse-primary": "#5d5f5f",
+                "error": "#ffb4ab",
+                "on-tertiary-container": "#636565",
+                "surface-container-lowest": "#0e0e0e",
+                "surface-container-high": "#2a2a2a",
+                "primary-container": "#e2e2e2",
+                "error-container": "#93000a",
+                "secondary-fixed": "#e5e2de",
+                "on-secondary": "#30302e",
+                "off-black": "#111111",
+                "surface": "#131313",
+                "primary-fixed": "#e2e2e2",
+                "background": "#131313",
+                "on-primary": "#2f3131",
+                "secondary-container": "#474744",
+                "tertiary-fixed-dim": "#c6c6c7",
+                "surface-tint": "#c6c6c7",
+                "tertiary-container": "#e2e2e2",
+                "tertiary-fixed": "#e2e2e2",
+                "surface-container-low": "#1c1b1b",
+                "primary": "#ffffff",
+                "on-error": "#690005",
+                "on-surface": "#e5e2e1",
+                "secondary": "#c8c6c3",
+                "on-secondary-fixed": "#1b1c1a",
+                "surface-dim": "#131313",
+                "on-background": "#e5e2e1",
+                "on-tertiary-fixed": "#1a1c1c",
+                "on-primary-fixed": "#1a1c1c",
+                "on-error-container": "#ffdad6",
+                "surface-bright": "#3a3939",
+                "primary-fixed-dim": "#c6c6c7",
+                "outline-variant": "#444748",
+                "surface-variant": "#353534",
+                "surface-container": "#201f1f",
+                "on-tertiary": "#2f3131",
+                "on-primary-container": "#636565",
+                "outline": "#8e9192",
+                "tertiary": "#ffffff",
+                "on-secondary-container": "#b7b5b1",
+                "inverse-on-surface": "#313030",
+                "secondary-fixed-dim": "#c8c6c3",
+                "zinc-800": "#27272A",
+                "slate-900": "#0F172A",
+                "on-secondary-fixed-variant": "#474744",
+                "inverse-surface": "#e5e2e1",
+                "on-surface-variant": "#c4c7c8",
+                "hairline-white": "rgba(255, 255, 255, 0.1)",
+                "on-primary-fixed-variant": "#454747",
+                "whatsapp": "#25D366"
+            },
+            "borderRadius": { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+            "spacing": { "bento-gap": "24px", "gutter": "16px", "macro-gap": "160px", "inner-padding": "32px", "section-py": "96px" },
+            "fontFamily": {
+                "headline-lg": ["Geist"], "display-hero": ["Geist"],
+                "label-eyebrow": ["JetBrains Mono"], "headline-lg-mobile": ["Geist"],
+                "mono-data": ["JetBrains Mono"], "body-base": ["Geist"]
+            },
+            "fontSize": {
+                "headline-lg": ["48px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                "display-hero": ["80px", { "lineHeight": "1.1", "letterSpacing": "-0.04em", "fontWeight": "700" }],
+                "label-eyebrow": ["10px", { "lineHeight": "1", "letterSpacing": "0.2em", "fontWeight": "700" }],
+                "headline-lg-mobile": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "600" }],
+                "mono-data": ["14px", { "lineHeight": "1.5", "letterSpacing": "0em", "fontWeight": "500" }],
+                "body-base": ["16px", { "lineHeight": "1.6", "letterSpacing": "0em", "fontWeight": "400" }]
+            }
+        }
+    }
+}
+</script>
+<style>
+html, body { overflow-x: hidden; }
+body { background-color: #131313; color: #ffffff; -webkit-font-smoothing: antialiased; }
+.reveal-section { opacity: 0; transform: translateY(40px); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); }
+.reveal-section.is-visible { opacity: 1; transform: translateY(0); }
+.glass-panel { background: rgba(17, 17, 17, 0.7); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); border: 1px solid rgba(255, 255, 255, 0.1); }
+.bento-card { background-color: #111111; border: 1px solid rgba(255, 255, 255, 0.1); padding: 32px; box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05); }
+.cinematic-bg-wrap { position: fixed; top: -18%; left: 0; right: 0; bottom: -18%; z-index: 0; pointer-events: none; background-color: #131313; will-change: transform; }
+.cinematic-bg-img { position: absolute; inset: 0; background-image: url(data:image/jpeg;base64,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EollJNQILYCiJQBKEUJSAsoQAAChAoIACgqUUFUalrXTnuOnTn0mt1TW50zb0x0i9ZTt383pXeuXWO2pvO+nfy949PTl2munXGl76xpdZ0klaWTQxm82c8rxN8pi61yuU58+vC44+X08NZ8zbU5Trkw0MaaOdoFMZ6chz6czHPrhOOOuK5zUOXPtz1nlnpzsznWak1iGdQksBRLCLCLACWFssRZRmxQl9dlvOAS5XUEQUgpAsEsIRVEilQBBQijIDWQoAQLLAAohSFCwihZCxSVYgoItlqlC2qUu89Y1vG5rozuN9eXSXrc7je8bOvbh1Xr159o69OXXGujWjr6fP0m+2+Gl9WuHWN9OO06a57aZZM89c2eHm9XktykRnOZnGJNpx68zireJnWCZtM24LEGpozz7cjlN058unNnnnrzOUuLZy7cdZ5Z3izOdZqTWISjJIsolkqxSCIKiggCW51mhT1BhLC5ogUBAAAQEFAEAEogFACFIQqUlQWAsFuSywqCywELQihCKoFpZSy6JVpvOo10z0i26am5qL15dJeuufSOm89TXXl3XXbn3jp049sa3uaXp15amumue5OvTju66647k73ltdZYRy3wJ5O/GuWLzmdZznUxz1m1nUZ4E3Lz1ggBTOaLvOhjpzMTfMzz65Thz68U553z1by64s4c+3K5mN5M51mksjIBBNQRYiwgqWFspGaUsEsl9aLzAICxUsBAuV1BAWBAEFShKEUAAlgVCNQgChKIAACwLFEsLLAUFBRrOi2WtLI1vOy9ee5rZS7zqXWpuN9Majp15dTr0x1Xp057l6+jz9c66a59I6duHaastXW5g1rjT0dvN0OuM5kcOnBc8tcbnPDpws6c7KgJnWGeUZ3HPcJbkpTM3zNqGULw78DXPeTl5/RwTljpimLjUzz6c7nGdZMzWayIksAIIubKsCLACLCgkqWwr1ZpghbLAAQWBLFlQKRLBLVksAACiASiKCCNQlQssACwAqaJLSRokolgagA1c2GoG5dNazqNdM2XdaVpRvOo66x0l11x0i9MdF7defQ63O8XXXl2ut3G8zp246mu949mt5uRFL147LJgvK80xyvO5zy1KzjpzLrnGd45tTLNrWd4IBqUxNQ1mjOOmC8+vM551yHLphOPPtyrGOmNZnLrzOWdZsksqZ1mGaIIQEWoBKJKlCyUM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); background-size: cover; background-position: center; opacity: 0.85; }
+.cinematic-bg-shade { position: absolute; inset: 0; background: radial-gradient(ellipse 90% 65% at 50% 10%, rgba(19,19,19,0) 0%, rgba(19,19,19,0.4) 78%), linear-gradient(rgba(19,19,19,0.2), rgba(19,19,19,0.55) 85%); }
+.film-grain { position: fixed; inset: 0; z-index: 90; pointer-events: none; opacity: 0.045; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 280px 280px; }
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); display: flex; align-items: center; justify-content: center; padding: 20px; opacity: 0; pointer-events: none; transition: opacity 0.35s ease; }
+.modal-overlay.active { opacity: 1; pointer-events: auto; }
+.modal-content { background: #1a1a1a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; padding: 32px; transform: translateY(20px) scale(0.98); transition: transform 0.4s cubic-bezier(0.16,1,0.3,1); }
+.modal-overlay.active .modal-content { transform: translateY(0) scale(1); }
+.input-field { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; padding: 14px 16px; color: white; font-family: 'Geist', sans-serif; font-size: 15px; outline: none; transition: all 0.2s; }
+.input-field:focus { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.08); }
+.input-field::placeholder { color: rgba(255,255,255,0.4); }
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); z-index: 200; padding: 14px 24px; border-radius: 100px; font-family: 'JetBrains Mono'; font-size: 13px; transition: all 0.5s cubic-bezier(0.16,1,0.3,1); opacity: 0; }
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+@keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-4px)} 75%{transform:translateX(4px)} }
+.shake { animation: shake 0.3s ease; }
+</style>
+</head>
+<body class="bg-background selection:bg-white selection:text-black">
+
+<!-- CONFIG - EDIT THESE -->
+<script>
+const CONFIG = {
+  WHATSAPP_NUMBER: "639554430116",
+  TELEGRAM_BOT_TOKEN: "8761769012:AAFMKjMBj4H26Wc15HUVcgil0Qgz4DZZ3Jc",
+  TELEGRAM_CHAT_ID: "7574027479",
+  PRODUCT_NAME: "SmartPlug",
+  PRODUCT_PRICE: "$10",
+  USE_BACKEND: false,
+  BACKEND_URL: "/api/order"
+};
+</script>
+
+<div aria-hidden="true" class="cinematic-bg-wrap"><div class="cinematic-bg-img"></div><div class="cinematic-bg-shade"></div></div>
+<div aria-hidden="true" class="film-grain"></div>
+
+<!-- TopNavBar -->
+<nav class="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] md:w-auto md:min-w-[640px] rounded-full border border-hairline-white backdrop-blur-3xl px-5 py-2.5 md:px-8 md:py-3 bg-surface/30 bg-clip-padding flex justify-between items-center gap-4 md:gap-8">
+<div class="text-2xl md:text-headline-lg font-headline-lg tracking-tighter text-primary">SmartPlug</div>
+<div class="hidden md:flex items-center gap-2">
+<a class="font-body-base text-body-base uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors hover:bg-white/5 rounded-full px-4 py-2" href="#tech-specs">Specs</a>
+<a class="font-body-base text-body-base uppercase tracking-widest text-on-surface-variant hover:text-primary transition-colors hover:bg-white/5 rounded-full px-4 py-2" href="#contact">Contact</a>
+</div>
+<div class="flex items-center gap-2">
+<button onclick="openWhatsApp()" class="bg-[#25D366] text-black font-mono-data text-[11px] uppercase tracking-widest px-4 py-2.5 md:px-5 rounded-full hover:scale-95 active:scale-90 transition-transform flex items-center gap-2">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.05 4.94A9.91 9.91 0 0 0 12.04 2C6.46 2 1.95 6.5 1.95 12.08c0 1.78.46 3.51 1.34 5.04L2 22l4.99-1.31a9.87 9.87 0 0 0 4.72 1.2h.01c5.58 0 10.08-4.5 10.08-10.08 0-2.69-1.05-5.22-2.95-7.12l-.01-.01zM12.05 19.83a7.92 7.92 0 0 1-4.04-1.11l-.29-.17-2.96.78.79-2.89-.19-.3a7.96 7.96 0 0 1-1.22-4.26c0-4.39 3.57-7.96 7.96-7.96 2.13 0 4.13.83 5.63 2.33a7.9 7.9 0 0 1 2.33 5.63c0 4.39-3.57 7.96-7.97 7.96h-.04zM16.58 14.58c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.19-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.02-.37.1-.49.1-.1.24-.26.36-.39.12-.13.16-.22.24-.38.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.39-.41-.54-.42h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.69 2.58 4.1 3.62.57.25 1.02.4 1.37.51.57.18 1.09.16 1.5.1.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/></svg>
+WhatsApp
+</button>
+<button onclick="openOrderModal()" class="bg-primary text-[#050505] font-mono-data text-[11px] uppercase tracking-widest px-5 py-2.5 rounded-full hover:scale-95 active:scale-90 transition-transform">Purchase Now</button>
+</div>
+</nav>
+
+<!-- HERO -->
+<section class="relative min-h-screen flex flex-col items-center justify-center pt-32 pb-16 md:pt-36 md:pb-24 overflow-hidden">
+<div class="absolute inset-0 pointer-events-none z-0 flex items-center justify-center opacity-30"><div class="w-[800px] h-[800px] rounded-full bg-white/5 blur-[120px]"></div></div>
+<div class="relative z-10 text-center max-w-4xl mx-auto px-5 md:px-inner-padding mb-12 reveal-section is-visible">
+<h1 class="font-display-hero text-5xl md:text-display-hero text-primary mb-6">Absolute Control.</h1>
+<p class="font-body-base text-body-base text-secondary max-w-2xl mx-auto text-base md:text-xl mb-10">The minimalist foundation for a smarter home. Precision engineering meets pure simplicity.</p>
+
+<!-- TWO OPTIONS HERO CTAs -->
+<div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+<button onclick="openOrderModal()" class="group bg-white text-black font-mono-data text-mono-data uppercase tracking-widest px-10 py-4 rounded-full hover:scale-[0.98] active:scale-95 transition-all flex items-center gap-3 w-full sm:w-auto justify-center">
+<span class="material-symbols-outlined text-[18px]">shopping_bag</span>
+Purchase Now - $10
+</button>
+<button onclick="openWhatsApp()" class="group bg-transparent border border-white/20 text-white font-mono-data text-mono-data uppercase tracking-widest px-10 py-4 rounded-full hover:bg-white hover:text-black transition-all flex items-center gap-3 w-full sm:w-auto justify-center">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.05 4.94A9.91 9.91 0 0 0 12.04 2C6.46 2 1.95 6.5 1.95 12.08c0 1.78.46 3.51 1.34 5.04L2 22l4.99-1.31a9.87 9.87 0 0 0 4.72 1.2h.01c5.58 0 10.08-4.5 10.08-10.08 0-2.69-1.05-5.22-2.95-7.12l-.01-.01zM12.05 19.83a7.92 7.92 0 0 1-4.04-1.11l-.29-.17-2.96.78.79-2.89-.19-.3a7.96 7.96 0 0 1-1.22-4.26c0-4.39 3.57-7.96 7.96-7.96 2.13 0 4.13.83 5.63 2.33a7.9 7.9 0 0 1 2.33 5.63c0 4.39-3.57 7.96-7.97 7.96h-.04zM16.58 14.58c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.19-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.02-.37.1-.49.1-.1.24-.26.36-.39.12-.13.16-.22.24-.38.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.39-.41-.54-.42h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.69 2.58 4.1 3.62.57.25 1.02.4 1.37.51.57.18 1.09.16 1.5.1.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/></svg>
+Contact on WhatsApp
+</button>
+</div>
+<div class="mt-4 flex items-center justify-center gap-3"><span class="font-label-eyebrow text-label-eyebrow text-on-surface-variant uppercase border border-hairline-white rounded-full px-4 py-1.5">COD · 3-4 days delivery · Lebanon & PH</span></div>
+</div>
+
+<div class="relative z-10 w-full max-w-5xl mx-auto px-5 md:px-inner-padding h-[55vh] md:h-[72vh] flex items-center justify-center reveal-section is-visible">
+<div class="relative w-full h-full bento-card rounded-[2rem] overflow-hidden flex items-center justify-center bg-gradient-to-b from-white/[0.07] to-transparent">
+<img src="https://images.unsplash.com/photo-1558089175-33ac408a0955?auto=format&fit=crop&w=1000&q=80" class="w-[65%] md:w-[50%] object-contain drop-shadow-[0_30px_60px_rgba(0,0,0,0.6)]"/>
+<div class="absolute bottom-6 left-6 right-6 flex justify-between items-center">
+<div class="glass-panel rounded-full px-4 py-2 flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-whatsapp animate-pulse"></div><span class="font-mono-data text-[10px] uppercase tracking-widest">In Stock</span></div>
+<div class="glass-panel rounded-full px-4 py-2"><span class="font-mono-data text-[10px] uppercase tracking-widest">$10 · Free COD</span></div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Specs -->
+<section class="py-16 md:py-section-py relative z-10 border-t border-hairline-white" id="tech-specs">
+<div class="max-w-7xl mx-auto px-5 md:px-inner-padding">
+<div class="mb-12 reveal-section text-center"><h2 class="font-label-eyebrow text-label-eyebrow text-secondary uppercase mb-4">Technical Specifications</h2><div class="h-px w-12 bg-primary/30 mx-auto"></div></div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 reveal-section">
+<div class="bento-card rounded-2xl text-center"><span class="font-label-eyebrow text-label-eyebrow text-on-surface-variant uppercase block mb-2">Input</span><span class="font-mono-data text-xl text-primary">AC 100-240V</span></div>
+<div class="bento-card rounded-2xl text-center"><span class="font-label-eyebrow text-label-eyebrow text-on-surface-variant uppercase block mb-2">Max Load</span><span class="font-mono-data text-xl text-primary">10A</span></div>
+<div class="bento-card rounded-2xl text-center"><span class="font-label-eyebrow text-label-eyebrow text-on-surface-variant uppercase block mb-2">Connectivity</span><span class="font-mono-data text-xl text-primary">WiFi 2.4G</span></div>
+<div class="bento-card rounded-2xl text-center"><span class="font-label-eyebrow text-label-eyebrow text-on-surface-variant uppercase block mb-2">App</span><span class="font-mono-data text-xl text-primary">Cozylife</span></div>
+</div>
+</div>
+</section>
+
+<!-- PRICING WITH TWO OPTIONS -->
+<section class="py-20 md:py-32 relative z-10 border-t border-hairline-white bg-[#0e0e0e]/90 backdrop-blur-md">
+<div class="max-w-4xl mx-auto px-5 md:px-inner-padding text-center reveal-section is-visible">
+<div class="inline-flex items-center gap-2 border border-white/10 rounded-full px-4 py-1.5 mb-8"><span class="w-2 h-2 bg-whatsapp rounded-full animate-pulse"></span><span class="font-label-eyebrow text-[10px] text-secondary uppercase tracking-widest">Ready to ship today</span></div>
+<h2 class="font-display-hero text-6xl md:text-[88px] text-primary mb-4">$10</h2>
+<p class="font-body-base text-secondary text-xl mb-8">For a smarter home. Cash on Delivery available.</p>
+<div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
+<button onclick="openOrderModal()" class="bg-white text-black font-mono-data text-mono-data uppercase tracking-widest px-12 py-4 rounded-full hover:scale-[0.98] transition-transform w-full sm:w-auto text-center flex items-center justify-center gap-2"><span class="material-symbols-outlined text-[18px]">bolt</span>Purchase Now - Website</button>
+<button onclick="openWhatsApp()" class="bg-transparent border border-whatsapp/50 text-whatsapp hover:bg-whatsapp hover:text-black font-mono-data text-mono-data uppercase tracking-widest px-12 py-4 rounded-full transition-all w-full sm:w-auto text-center flex items-center justify-center gap-2"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.05 4.94A9.91 9.91 0 0 0 12.04 2C6.46 2 1.95 6.5 1.95 12.08c0 1.78.46 3.51 1.34 5.04L2 22l4.99-1.31a9.87 9.87 0 0 0 4.72 1.2h.01c5.58 0 10.08-4.5 10.08-10.08 0-2.69-1.05-5.22-2.95-7.12l-.01-.01zM12.05 19.83a7.92 7.92 0 0 1-4.04-1.11l-.29-.17-2.96.78.79-2.89-.19-.3a7.96 7.96 0 0 1-1.22-4.26c0-4.39 3.57-7.96 7.96-7.96 2.13 0 4.13.83 5.63 2.33a7.9 7.9 0 0 1 2.33 5.63c0 4.39-3.57 7.96-7.97 7.96h-.04zM16.58 14.58c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.19-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.02-.37.1-.49.1-.1.24-.26.36-.39.12-.13.16-.22.24-.38.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.39-.41-.54-.42h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.69 2.58 4.1 3.62.57.25 1.02.4 1.37.51.57.18 1.09.16 1.5.1.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/></svg>Contact on WhatsApp</button>
+</div>
+<p class="font-mono-data text-[11px] text-on-surface-variant">⚡ Option 1: Buy instantly via website and we notify on Telegram — Option 2: Chat with us on WhatsApp</p>
+</div>
+</section>
+
+<!-- Footer -->
+<footer class="w-full py-16 border-t border-hairline-white bg-background/90 backdrop-blur-xl relative z-10" id="contact">
+<div class="max-w-7xl mx-auto px-5 md:px-inner-padding flex flex-col md:flex-row justify-between items-start gap-8">
+<div class="flex flex-col gap-4"><span class="font-headline-lg text-primary text-2xl">SmartPlug</span><p class="font-mono-data text-mono-data text-secondary opacity-80">© 2024 SmartPlug. All rights reserved.</p></div>
+<div class="flex gap-12"><div class="flex flex-col gap-3"><span class="font-label-eyebrow text-label-eyebrow text-on-surface-variant uppercase">Contact</span><button onclick="openWhatsApp()" class="font-mono-data text-mono-data text-on-surface-variant hover:text-whatsapp text-left">WhatsApp: +63 9554430116</button><span class="font-mono-data text-mono-data text-on-surface-variant">COD · 3-4 days</span></div>
+<div class="flex flex-col gap-3"><span class="font-label-eyebrow text-label-eyebrow text-on-surface-variant uppercase">Orders</span><span class="font-mono-data text-mono-data text-on-surface-variant">Website orders → Telegram</span><span class="font-mono-data text-mono-data text-on-surface-variant">Instant notification</span></div></div>
+</div>
+</footer>
+
+<!-- ORDER MODAL -->
+<div id="orderModal" class="modal-overlay" onclick="if(event.target===this) closeOrderModal()">
+<div class="modal-content">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h3 class="font-headline-lg text-2xl text-white mb-1">Purchase SmartPlug</h3>
+<p class="font-mono-data text-[12px] text-secondary">Fill details · COD · 3-4 days</p>
+</div>
+<button onclick="closeOrderModal()" class="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 transition-colors"><span class="material-symbols-outlined text-[20px]">close</span></button>
+</div>
+
+<div class="bento-card rounded-xl p-4 mb-6 flex justify-between items-center bg-white/[0.03]">
+<div class="flex items-center gap-3"><div class="w-12 h-12 rounded-lg bg-white flex items-center justify-center"><span class="material-symbols-outlined text-black">power</span></div><div><div class="font-mono-data text-[13px] text-white font-semibold">SmartPlug × <span id="modalQtyDisplay">1</span></div><div class="font-mono-data text-[11px] text-secondary">$10 each / COD</div></div></div>
+<div class="font-headline-lg text-xl" id="modalTotal">$10</div>
+</div>
+
+<form id="orderForm" onsubmit="submitOrder(event)" class="space-y-4" novalidate>
+<div>
+<label class="font-label-eyebrow text-[10px] uppercase tracking-widest text-secondary mb-2 block">Full Name *</label>
+<input required type="text" id="fullName" class="input-field" placeholder="John Doe" autocomplete="name"/>
+</div>
+<div>
+<label class="font-label-eyebrow text-[10px] uppercase tracking-widest text-secondary mb-2 block">Mobile Phone Number *</label>
+<div class="flex gap-2">
+<select id="phoneCode" class="input-field w-[110px] flex-shrink-0">
+<option value="+961">🇱🇧 +961</option>
+<option value="+63" selected>🇵🇭 +63</option>
+<option value="+966">🇸🇦 +966</option>
+<option value="+971">🇦🇪 +971</option>
+<option value="+90">🇹🇷 +90</option>
+<option value="+1">🇺🇸 +1</option>
+<option value="+44">🇬🇧 +44</option>
+</select>
+<input required type="tel" id="phone" class="input-field flex-1" placeholder="71 123456" autocomplete="tel"/>
+</div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div><label class="font-label-eyebrow text-[10px] uppercase tracking-widest text-secondary mb-2 block">City *</label><input required type="text" id="city" class="input-field" placeholder="Beirut / Manila"/></div>
+<div><label class="font-label-eyebrow text-[10px] uppercase tracking-widest text-secondary mb-2 block">Quantity</label><select id="quantity" onchange="updateModalTotal()" class="input-field"><option value="1">1 pc - $10</option><option value="2">2 pcs - $20</option><option value="3">3 pcs - $30</option><option value="5">5 pcs - $45 (-10%)</option></select></div>
+</div>
+<div>
+<label class="font-label-eyebrow text-[10px] uppercase tracking-widest text-secondary mb-2 block">Street / Address *</label>
+<input required type="text" id="street" class="input-field" placeholder="Street, Building, Floor, Area"/>
+</div>
+<div>
+<label class="font-label-eyebrow text-[10px] uppercase tracking-widest text-secondary mb-2 block">Notes (optional)</label>
+<textarea id="notes" rows="2" class="input-field resize-none" placeholder="Near ... / delivery instructions"></textarea>
+</div>
+
+<div id="formError" class="hidden bg-error-container/30 border border-error/20 rounded-xl p-3 font-mono-data text-[12px] text-error"></div>
+
+<button type="submit" id="submitBtn" class="w-full bg-white text-black font-mono-data text-[13px] uppercase tracking-widest py-4 rounded-full hover:bg-white/90 transition-all flex items-center justify-center gap-2 mt-2">
+<span id="submitText" class="flex items-center gap-2"><span class="material-symbols-outlined text-[18px]">shopping_bag</span>Confirm Order - COD</span>
+<span id="submitLoader" class="hidden items-center gap-2"><svg class="animate-spin h-4 w-4" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>Sending...</span>
+</button>
+
+<div class="flex items-center justify-center gap-2 mt-3">
+<span class="material-symbols-outlined text-[14px] text-secondary">lock</span>
+<span class="font-mono-data text-[10px] text-secondary">Secure · Your info goes only to Telegram bot · COD payment</span>
+</div>
+
+<div class="pt-4 border-t border-white/10 mt-4 flex justify-center">
+<button type="button" onclick="closeOrderModal(); openWhatsApp();" class="font-mono-data text-[11px] text-whatsapp hover:underline flex items-center gap-1.5"><svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M19.05 4.94A9.91 9.91 0 0 0 12.04 2C6.46 2 1.95 6.5 1.95 12.08c0 1.78.46 3.51 1.34 5.04L2 22l4.99-1.31a9.87 9.87 0 0 0 4.72 1.2h.01c5.58 0 10.08-4.5 10.08-10.08 0-2.69-1.05-5.22-2.95-7.12l-.01-.01zM12.05 19.83a7.92 7.92 0 0 1-4.04-1.11l-.29-.17-2.96.78.79-2.89-.19-.3a7.96 7.96 0 0 1-1.22-4.26c0-4.39 3.57-7.96 7.96-7.96 2.13 0 4.13.83 5.63 2.33a7.9 7.9 0 0 1 2.33 5.63c0 4.39-3.57 7.96-7.97 7.96h-.04zM16.58 14.58c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.19-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.02-.37.1-.49.1-.1.24-.26.36-.39.12-.13.16-.22.24-.38.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.39-.41-.54-.42h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.69 2.58 4.1 3.62.57.25 1.02.4 1.37.51.57.18 1.09.16 1.5.1.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/></svg>Prefer WhatsApp? Click here</span>
+</div>
+</form>
+</div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div id="successModal" class="modal-overlay" onclick="if(event.target===this) closeSuccessModal()">
+<div class="modal-content text-center">
+<div class="w-20 h-20 rounded-full bg-whatsapp/20 flex items-center justify-center mx-auto mb-6"><span class="material-symbols-outlined text-[40px] text-whatsapp">check_circle</span></div>
+<h3 class="font-headline-lg text-2xl text-white mb-2">Order Received!</h3>
+<p class="font-body-base text-secondary text-[14px] mb-2">Thank you <span id="successName" class="text-white font-semibold"></span>!</p>
+<p class="font-mono-data text-[12px] text-on-surface-variant mb-6">Order <span id="successOrderId" class="text-white"></span> sent to Telegram. We will contact you on <span id="successPhone" class="text-white"></span> soon for COD delivery (3-4 days).</p>
+<div class="flex gap-3 justify-center">
+<button onclick="closeSuccessModal()" class="bg-white text-black px-8 py-3 rounded-full font-mono-data text-[12px] uppercase tracking-widest">Continue Shopping</button>
+<button onclick="closeSuccessModal(); openWhatsApp();" class="bg-whatsapp text-black px-8 py-3 rounded-full font-mono-data text-[12px] uppercase tracking-widest flex items-center gap-2"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19.05 4.94A9.91 9.91 0 0 0 12.04 2C6.46 2 1.95 6.5 1.95 12.08c0 1.78.46 3.51 1.34 5.04L2 22l4.99-1.31a9.87 9.87 0 0 0 4.72 1.2h.01c5.58 0 10.08-4.5 10.08-10.08 0-2.69-1.05-5.22-2.95-7.12l-.01-.01zM12.05 19.83a7.92 7.92 0 0 1-4.04-1.11l-.29-.17-2.96.78.79-2.89-.19-.3a7.96 7.96 0 0 1-1.22-4.26c0-4.39 3.57-7.96 7.96-7.96 2.13 0 4.13.83 5.63 2.33a7.9 7.9 0 0 1 2.33 5.63c0 4.39-3.57 7.96-7.97 7.96h-.04zM16.58 14.58c-.24-.12-1.42-.7-1.64-.78-.22-.08-.38-.12-.54.12-.16.24-.62.78-.76.94-.14.16-.28.18-.52.06-.24-.12-1.01-.37-1.92-1.19-.71-.63-1.19-1.41-1.33-1.65-.14-.24-.02-.37.1-.49.1-.1.24-.26.36-.39.12-.13.16-.22.24-.38.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.47-.39-.41-.54-.42h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.69 2.58 4.1 3.62.57.25 1.02.4 1.37.51.57.18 1.09.16 1.5.1.46-.07 1.42-.58 1.62-1.14.2-.56.2-1.04.14-1.14-.06-.1-.22-.16-.46-.28z"/></svg>Chat on WhatsApp</button>
+</div>
+</div>
+</div>
+
+<div id="toast" class="toast bg-white text-black"></div>
+
+<script>
+// Reveal on scroll
+document.addEventListener("DOMContentLoaded", () => {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => { if (entry.isIntersecting) entry.target.classList.add('is-visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal-section').forEach(el => observer.observe(el));
+});
+
+function openWhatsApp() {
+  const msg = `Hi! I'd like to purchase the ${CONFIG.PRODUCT_NAME} for ${CONFIG.PRODUCT_PRICE}. COD - 3-4 days delivery.`;
+  const url = `https://wa.me/${CONFIG.WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+}
+
+function openOrderModal() { document.getElementById('orderModal').classList.add('active'); document.body.style.overflow='hidden'; }
+function closeOrderModal() { document.getElementById('orderModal').classList.remove('active'); document.body.style.overflow=''; }
+function closeSuccessModal() { document.getElementById('successModal').classList.remove('active'); document.body.style.overflow=''; }
+
+function updateModalTotal() {
+  const qty = parseInt(document.getElementById('quantity').value);
+  const prices = {1:10,2:20,3:30,5:45};
+  const total = prices[qty] || qty*10;
+  document.getElementById('modalQtyDisplay').textContent = qty;
+  document.getElementById('modalTotal').textContent = `$${total}`;
+}
+
+function showToast(msg, ok=true) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = ok ? '#fff' : '#ffb4ab';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 4000);
+}
+
+function showFormError(msg) {
+  const el = document.getElementById('formError');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+  el.classList.add('shake');
+  setTimeout(()=>el.classList.remove('shake'), 400);
+}
+
+function generateOrderId() { return 'SP-'+Date.now().toString().slice(-6)+'-'+Math.floor(Math.random()*900+100); }
+
+async function submitOrder(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const txt = document.getElementById('submitText');
+  const loader = document.getElementById('submitLoader');
+  const errorEl = document.getElementById('formError');
+  errorEl.classList.add('hidden');
+
+  const fullName = document.getElementById('fullName').value.trim();
+  const phoneCode = document.getElementById('phoneCode').value;
+  const phone = document.getElementById('phone').value.trim();
+  const city = document.getElementById('city').value.trim();
+  const street = document.getElementById('street').value.trim();
+  const qty = document.getElementById('quantity').value;
+  const notes = document.getElementById('notes').value.trim();
+  const orderId = generateOrderId();
+
+  if(!fullName || fullName.length<3){ showFormError('Please enter your full name (at least 3 chars)'); return; }
+  if(!phone || phone.length<6){ showFormError('Please enter valid mobile number'); return; }
+  if(!city){ showFormError('Please enter your city'); return; }
+  if(!street || street.length<5){ showFormError('Please enter your street / full address'); return; }
+
+  btn.disabled = true; txt.classList.add('hidden'); loader.classList.remove('hidden'); loader.classList.add('flex');
+
+  const fullPhone = phoneCode + ' ' + phone;
+  const total = {1:10,2:20,3:30,5:45}[qty] || qty*10;
+
+  // Telegram message - fancy formatting
+  const telegramMessage = `
+🛒 *NEW ORDER - ${CONFIG.PRODUCT_NAME}*
+
+🆔 *Order ID:* ${orderId}
+📦 *Product:* ${CONFIG.PRODUCT_NAME} x${qty}
+💰 *Total:* $${total} (COD)
+
+👤 *Customer:*
+• Name: ${fullName}
+• Phone: ${fullPhone}
+• City: ${city}
+• Street: ${street}
+${notes ? `• Notes: ${notes}` : ''}
+
+⏰ *Time:* ${new Date().toLocaleString('en-LB', {timeZone:'Asia/Beirut'})}
+🌐 *Source:* Website Purchase
+
+✅ Action: Contact customer for delivery (3-4 days)
+`;
+
+  try {
+    let sent = false;
+    if(CONFIG.USE_BACKEND && CONFIG.BACKEND_URL) {
+      // Secure backend mode
+      const res = await fetch(CONFIG.BACKEND_URL, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({orderId, fullName, phone: fullPhone, city, street, quantity: qty, total, notes, telegramMessage})
+      });
+      if(!res.ok) throw new Error('Backend failed');
+      sent = true;
+    } else {
+      // Direct Telegram API mode (quick start)
+      if(!CONFIG.TELEGRAM_BOT_TOKEN || !CONFIG.TELEGRAM_CHAT_ID) {
+        // DEMO MODE - no credentials set, save locally
+        console.warn('Telegram credentials not set - demo mode');
+        const orders = JSON.parse(localStorage.getItem('smartplug_orders')||'[]');
+        orders.unshift({orderId, fullName, phone: fullPhone, city, street, qty, total, notes, time: new Date().toISOString()});
+        localStorage.setItem('smartplug_orders', JSON.stringify(orders));
+        sent = true;
+        showToast('DEMO MODE: Order saved locally. Set Telegram token to get real notifications!', false);
+      } else {
+        const url = `https://api.telegram.org/bot${CONFIG.TELEGRAM_BOT_TOKEN}/sendMessage`;
+        const res = await fetch(url, {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({
+            chat_id: CONFIG.TELEGRAM_CHAT_ID,
+            text: telegramMessage,
+            parse_mode: 'Markdown'
+          })
+        });
+        const data = await res.json();
+        if(!data.ok) {
+          console.error('Telegram error', data);
+          throw new Error(data.description || 'Telegram send failed');
+        }
+        sent = true;
+      }
+    }
+
+    if(sent) {
+      closeOrderModal();
+      document.getElementById('successName').textContent = fullName;
+      document.getElementById('successPhone').textContent = fullPhone;
+      document.getElementById('successOrderId').textContent = orderId;
+      document.getElementById('successModal').classList.add('active');
+      document.getElementById('orderForm').reset();
+      updateModalTotal();
+      showToast(`Order ${orderId} sent! 🔔 Telegram notified`);
+
+      // Save also locally for admin view
+      const all = JSON.parse(localStorage.getItem('smartplug_orders')||'[]');
+      all.unshift({orderId, fullName, phone: fullPhone, city, street, qty, total, notes, time: new Date().toISOString()});
+      localStorage.setItem('smartplug_orders', JSON.stringify(all.slice(0,100)));
+    }
+
+  } catch(err) {
+    console.error(err);
+    showFormError('Failed to send order: ' + err.message + '. Try WhatsApp contact instead.');
+    showToast('Error sending order. Try WhatsApp.', false);
+  } finally {
+    btn.disabled = false; txt.classList.remove('hidden'); loader.classList.add('hidden'); loader.classList.remove('flex');
+  }
+}
+
+// Close modals with ESC
+document.addEventListener('keydown', (e)=>{ if(e.key==='Escape'){ closeOrderModal(); closeSuccessModal(); } });
+</script>
+</body>
+</html>
